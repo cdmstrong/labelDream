@@ -2,8 +2,11 @@
 #define UTIL_H
 
 #include <QList>
+#include <QColor>
+#include <QIcon>
 
 namespace ColorUtils{
+
     extern QList<QColor> randomColors(int count);
     extern QColor randomColor();
 

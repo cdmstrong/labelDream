@@ -37,149 +37,11 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>671</width>
-         <height>932</height>
+         <width>698</width>
+         <height>910</height>
         </rect>
        </property>
       </widget>
-     </widget>
-    </item>
-    <item>
-     <widget class="QWidget" name="widget_6" native="true">
-      <property name="minimumSize">
-       <size>
-        <width>308</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>308</width>
-        <height>1000</height>
-       </size>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
-       <item>
-        <widget class="QWidget" name="widget" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Annotations</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QListView" name="annoList">
-            <property name="styleSheet">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QWidget" name="widget_2" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QLabel" name="label_2">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Labels</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="CustomListWidget" name="labelsList"/>
-          </item>
-          <item>
-           <widget class="QWidget" name="widget_3" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
-             </property>
-             <item>
-              <widget class="QTextEdit" name="labelEdit">
-               <property name="maximumSize">
-                <size>
-                 <width>226</width>
-                 <height>33</height>
-                </size>
-               </property>
-               <property name="lineWrapMode">
-                <enum>QTextEdit::NoWrap</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnAdd">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>31</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>51</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>add</string>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>16</width>
-                 <height>16</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QWidget" name="widget_4" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QLabel" name="label_3">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Files</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QListView" name="filesList"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
      </widget>
     </item>
    </layout>
@@ -190,7 +52,7 @@
      <x>0</x>
      <y>0</y>
      <width>1005</width>
-     <height>23</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -244,9 +106,135 @@
    <addaction name="scanIn_action"/>
    <addaction name="init_action"/>
   </widget>
+  <widget class="QDockWidget" name="annoDocker">
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_6">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Annotations</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QListView" name="annoList">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="labelDocker">
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Labels</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="CustomListWidget" name="labelsList"/>
+     </item>
+     <item>
+      <widget class="QWidget" name="widget_3" native="true">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
+        <item>
+         <widget class="QTextEdit" name="labelEdit">
+          <property name="maximumSize">
+           <size>
+            <width>226</width>
+            <height>33</height>
+           </size>
+          </property>
+          <property name="lineWrapMode">
+           <enum>QTextEdit::NoWrap</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAdd">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>31</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>51</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>add</string>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="filesDocker">
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Files</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QListView" name="filesList"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <action name="actionopen_file">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/file.png</normaloff>:/icons/file.png</iconset>
    </property>
    <property name="text">
@@ -255,7 +243,7 @@
   </action>
   <action name="actionopen_dir">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/open.png</normaloff>:/icons/open.png</iconset>
    </property>
    <property name="text">
@@ -264,7 +252,7 @@
   </action>
   <action name="actionLoad_File">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/copy.png</normaloff>:/icons/copy.png</iconset>
    </property>
    <property name="text">
@@ -303,7 +291,7 @@
   </action>
   <action name="img_action">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/expert.png</normaloff>:/icons/expert.png</iconset>
    </property>
    <property name="text">
@@ -315,7 +303,7 @@
   </action>
   <action name="file_action">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/open.png</normaloff>:/icons/open.png</iconset>
    </property>
    <property name="text">
@@ -327,7 +315,7 @@
   </action>
   <action name="save_action">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
    </property>
    <property name="text">
@@ -339,7 +327,7 @@
   </action>
   <action name="saveAs_action">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/save-as.png</normaloff>:/icons/save-as.png</iconset>
    </property>
    <property name="text">
@@ -351,7 +339,7 @@
   </action>
   <action name="unDo_action">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/undo.png</normaloff>:/icons/undo.png</iconset>
    </property>
    <property name="text">
@@ -363,7 +351,7 @@
   </action>
   <action name="reDo_action">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/redo.png</normaloff>:/icons/redo.png</iconset>
    </property>
    <property name="text">
@@ -375,7 +363,7 @@
   </action>
   <action name="pre_action">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/prev.png</normaloff>:/icons/prev.png</iconset>
    </property>
    <property name="text">
@@ -387,7 +375,7 @@
   </action>
   <action name="next_action">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/next.png</normaloff>:/icons/next.png</iconset>
    </property>
    <property name="text">
@@ -399,7 +387,7 @@
   </action>
   <action name="scanOut_action">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/zoom-in.png</normaloff>:/icons/zoom-in.png</iconset>
    </property>
    <property name="text">
@@ -411,7 +399,7 @@
   </action>
   <action name="scanIn_action">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/zoom-out.png</normaloff>:/icons/zoom-out.png</iconset>
    </property>
    <property name="text">
@@ -423,7 +411,7 @@
   </action>
   <action name="init_action">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/zoom.png</normaloff>:/icons/zoom.png</iconset>
    </property>
    <property name="text">
@@ -433,6 +421,7 @@
     <string>复原</string>
    </property>
   </action>
+  <zorder>annoDocker</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -441,6 +430,8 @@
    <header location="global">widgets/customListWidget.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
