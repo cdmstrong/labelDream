@@ -67,6 +67,11 @@ public:
    void popLabelMenu(const QPoint &pos);
    qreal scaleFitWindow() const;
    void adjustFitWindow();
+   //鼠标位置 显示
+   void setMousePos(QPoint pos);
+
+
+   void taskModeChanged(int idx);
 protected:
 //   bool eventFilter(QObject *watched, QEvent *event);
 //   void mousePressEvent(QMouseEvent *event);
@@ -79,7 +84,8 @@ private:
     QToolBar *toolBar;
     //标签相关
     void _setupLabelManager();
-
+    //状态栏 鼠标位置
+    QLabel *mousePosLabel;
 
     bool isPressed;
     int rect[4] = {0};

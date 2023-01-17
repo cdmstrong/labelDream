@@ -37,8 +37,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>698</width>
-         <height>910</height>
+         <width>663</width>
+         <height>932</height>
         </rect>
        </property>
       </widget>
@@ -52,7 +52,7 @@
      <x>0</x>
      <y>0</y>
      <width>1005</width>
-     <height>24</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -117,6 +117,7 @@
        <property name="font">
         <font>
          <pointsize>10</pointsize>
+         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -146,6 +147,7 @@
        <property name="font">
         <font>
          <pointsize>10</pointsize>
+         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -218,6 +220,7 @@
        <property name="font">
         <font>
          <pointsize>10</pointsize>
+         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>

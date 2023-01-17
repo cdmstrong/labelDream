@@ -36,7 +36,8 @@ SOURCES += \
     canvas/canvas2d.cpp \
     canvas/canvasbase.cpp \
     controllers/annotationmanager.cpp \
-    controllers/filemanager.cpp
+    controllers/filemanager.cpp \
+    annotations/annotationBase.cpp
 
 
 HEADERS += \
@@ -51,7 +52,9 @@ HEADERS += \
     canvas/canvas2d.h \
     widgets/customListWidget.h \
     controllers/labelmanager.h \
-    canvas/canvasbase.h
+    canvas/canvasbase.h \
+    annotations/annotationBase.h \
+    annotations/annotationBase.h
 
 FORMS += \
         mainwindow.ui

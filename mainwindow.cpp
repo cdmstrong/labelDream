@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 
     ui->setupUi(this);
-    initToolBar();
+
     //绑定按钮事件
 //    ui->img->installEventFilter(this);
     //标签相关
@@ -24,12 +24,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     curCanvas = canvas2d;
-
-    ui->scrollArea->setAlignment(Qt::AlignCenter);
     ui->scrollArea->setWidget(curCanvas);
+    ui->scrollArea->setAlignment(Qt::AlignCenter);
 
+    ui->scrollArea->setWidgetResizable(true);
     bindEvent();
-
+    initToolBar();
+    qDebug() << "current-widget" <<  ui->scrollArea->alignment();
 }
 
 //标签相关
@@ -98,6 +99,10 @@ void MainWindow::addLabel() {
     bool suc = labelM.addLabel(name);
     if(!suc) QMessageBox::information(this, "err", "标签" + name + "已存在", QMessageBox::Ok);
 }
+void MainWindow::taskModeChanged(int idx) {
+    qDebug() << idx;
+    curCanvas->setTaskMode((TaskMode)idx);
+}
 void MainWindow::initToolBar() {
 
     QComboBox* task = new QComboBox(ui->toolBar);
@@ -106,7 +111,7 @@ void MainWindow::initToolBar() {
     task->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     ui->toolBar->insertWidget(ui->img_action, task);
-
+    connect(task, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::taskModeChanged);
     QComboBox* penShape = new QComboBox(ui->toolBar);
     penShape->addItem("rectangle", RECTANGLE);
     penShape->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -122,9 +127,20 @@ void MainWindow::initToolBar() {
     connect(ui->img_action, &QAction::triggered, this, [=]() {selectImg();});
     connect(ui->file_action, &QAction::triggered, this, [=]() {selectDir();});
 
+    connect(ui->init_action, &QAction::triggered, this, &MainWindow::adjustFitWindow);
+    connect(ui->scanOut_action, &QAction::triggered, this, [=]() {curCanvas->setScale(curCanvas->getScale()*1.1);});
+    connect(ui->scanIn_action, &QAction::triggered, this, [=]() {curCanvas->setScale(curCanvas->getScale()*0.9);});
 
+    //监听鼠标移动
+//    --------------------------------------状态栏相关--------------------------------------------------
+    mousePosLabel = new QLabel("");
+    ui->statusbar->addPermanentWidget(mousePosLabel);
+    connect(canvas2d, &Canvas2d::mouseMove, this, &MainWindow::setMousePos);
 }
+void MainWindow::setMousePos(QPoint pos) {
 
+    mousePosLabel->setText("(" + QString::number(pos.x()) + "," + QString::number(pos.y()) + ")" );
+}
 QAction* MainWindow::addBar(string icon, string barName) {
 
     QIcon *file = new QIcon(icon.c_str());

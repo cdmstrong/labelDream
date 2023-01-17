@@ -8,3 +8,9 @@ CanvasBase::CanvasBase(const LabelManager *labelM, const AnnotationManager *anno
 QString CanvasBase::modeString() const{
     return "";
 }
+
+void CanvasBase::setTaskMode(TaskMode mode)
+{
+    taskMode = mode;
+}
+
