@@ -1,5 +1,7 @@
 #include "canvas2d.h"
+#include <QMessageBox>
 #include <QPainter>
+#include <annotations/rectannoitem.h>
 
 Canvas2d::Canvas2d(LabelManager *labelM, AnnotationManager *annoM, QWidget *parent):CanvasBase(labelM, annoM, parent), pixmap()
 {
@@ -27,12 +29,32 @@ void Canvas2d::paintEvent(QPaintEvent* event)
     p.translate(offsetToCenter());
     p.drawPixmap(0, 0, pixmap);
 
+    //绘制标签
+
+
+
+
+
+
     //
-    qDebug() << "paintEvent" << curPoints.length();
+//    qDebug() << "paintEvent" << curPoints.length();
     if(curPoints.length() >0) {
         p.drawRect(QRect(curPoints[0], curPoints[1]).normalized());
     }
+    QBrush brush(Qt::SolidPattern);
 
+    QList<AnnoItemPtr> list = annoM->getList();
+    for(int i = 0;i <list.length(); i++) {
+        auto ptr = Rectannoitem::cast_rectPtr(list[i]);
+        QColor color = labelM->getLabel(ptr.get()->label)->color;
+        brush.setColor(color);
+
+        p.setBrush(brush);
+        p.drawRect(QRect(ptr.get()->points[0], ptr.get()->points[1]).normalized());
+        QFont font("Helvetica"); font.setFamily("Times"); font.setPixelSize(LABEL_PIXEL_SIZE);
+        p.setFont(font);
+        p.drawText(QPoint(ptr.get()->points[0].x() -20, ptr.get()->points[0].y()-20), ptr.get()->label);
+    }
 
 
 }
@@ -86,6 +108,7 @@ void Canvas2d::mousePressEvent(QMouseEvent* e)
                 curPoints.push_back(mousePos);
             } else if(curPoints.length() == 2) {
                 curPoints[1] = mousePos;
+                this->addAnno(curPoints);
                 update();
                 //存储画框
                 curPoints.clear();
@@ -97,7 +120,18 @@ void Canvas2d::mousePressEvent(QMouseEvent* e)
     }
 
 }
+void Canvas2d::addAnno(QList<QPoint> points) {
+    //如果当前有选择的标签
+    LabelProperty* text = labelM->getCurLabel();
+    qDebug() << "cur" << text;
+    if(!text) {
+        QMessageBox::information(this, "error", "请选择您要标注的标签");
+        return;
+    }
+    AnnoItemBase* anno = new Rectannoitem(text->id, text->label, points);
 
+    annoM->addAnno(std::shared_ptr<AnnoItemBase>(anno));
+}
 void Canvas2d::mouseReleaseEvent(QMouseEvent* e)
 {
     qDebug() << "mouseReleaseEvent";

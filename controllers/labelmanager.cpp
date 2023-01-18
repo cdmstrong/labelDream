@@ -50,6 +50,20 @@ bool LabelManager::fixColor(QString name, QColor color)
     return true;
 }
 
+void LabelManager::changeActiveItem(QListWidgetItem *current, QListWidgetItem *)
+{
+
+
+    curLabel = &labels.find(current->text()).value();
+    qDebug() << "curIdx" << curLabel->label;
+}
+
+LabelProperty* LabelManager::getCurLabel() const
+{
+    return curLabel;
+
+}
+
 //--------------------------------------LabelProperty ----------------------------------------
 
 LabelProperty::LabelProperty(QString label, QColor color, bool visible, QString id): label(label),color(color), visible(visible), id(id){

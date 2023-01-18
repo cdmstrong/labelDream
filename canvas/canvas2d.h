@@ -6,6 +6,8 @@
 #include <QMouseEvent>
 class Canvas2d: public CanvasBase {
     Q_OBJECT
+
+const int LABEL_PIXEL_SIZE = 35;
 public:
     Canvas2d(LabelManager* labelM, AnnotationManager* annoM, QWidget* parent = nullptr);
     QSize sizeUnscaled() const override;
@@ -20,6 +22,7 @@ public:
     QPoint boundedPixelPos(QPoint pos);
     // 判断像素坐标pos是否超出pixmap的范围
     bool outOfPixmap(QPoint pos);
+    void addAnno(QList<QPoint> points);
 protected:
     void paintEvent(QPaintEvent* e) override;
     void mouseMoveEvent(QMouseEvent* e) override;

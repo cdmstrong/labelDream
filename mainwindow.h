@@ -101,6 +101,7 @@ private slots:
 
 
     void on_labeltips_clicked();
+    void on_labelsList_itemClicked(QListWidgetItem *item);
 };
 
 

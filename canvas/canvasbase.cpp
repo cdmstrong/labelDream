@@ -1,9 +1,14 @@
 #include "canvasbase.h"
 
-CanvasBase::CanvasBase(const LabelManager *labelM, const AnnotationManager *annoM, QWidget *parent)
+CanvasBase::CanvasBase(LabelManager *labelM, AnnotationManager *annoM, QWidget *parent):
+    labelM(labelM), annoM(annoM)
 {
 
 }
+
+
+
+
 
 QString CanvasBase::modeString() const{
     return "";

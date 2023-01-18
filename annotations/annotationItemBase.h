@@ -1,14 +1,15 @@
 #ifndef ANNOTATIONBASE_H
 #define ANNOTATIONBASE_H
 #include <QString>
-class AnnoBase {
+class AnnoItemBase {
 public:
-    AnnoBase();
-private:
+    AnnoItemBase();
     //标签
     QString label;
     //坐标信息
-    QString 
+    QString id;
+protected:
+
 };
 
 #endif

@@ -38,6 +38,7 @@ void MainWindow::_setupLabelManager() {
     ui->labelsList->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->labelsList, &QListWidget::customContextMenuRequested, this, &MainWindow::popLabelMenu);
     connect(&labelM, &LabelManager::labelAdded, ui->labelsList, &CustomListWidget::addCustomItem);
+    connect(ui->labelsList, &QListWidget::currentItemChanged, &labelM, &LabelManager::changeActiveItem);
 }
 void MainWindow:: bindEvent() {
     connect(ui->btnAdd, &QPushButton::clicked,this, &MainWindow::addLabel);
@@ -45,7 +46,12 @@ void MainWindow:: bindEvent() {
     //窗口大小变换
 
 }
+//添加标签
 void MainWindow::addAnno() {
+    if(labelM.getCurLabel() == nullptr) {
+        QMessageBox::information(this, "error", "请选择您要标注的标签");
+        return;
+    }
 
 }
 
@@ -283,7 +289,11 @@ void  MainWindow::selectDir() {
 
 
 
-void MainWindow::on_labeltips_clicked()
+void MainWindow::on_labeltips_clicked() {
+
+}
+
+void MainWindow::on_labelsList_itemClicked(QListWidgetItem *item)
 {
 
 }

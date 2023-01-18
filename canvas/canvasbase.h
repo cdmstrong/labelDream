@@ -23,7 +23,7 @@ enum DrawMode{
 class CanvasBase: public QWidget {
     Q_OBJECT
 public:
-    explicit CanvasBase(const LabelManager* labelM, const AnnotationManager* annoM, QWidget* parent = nullptr);
+    explicit CanvasBase(LabelManager* labelM, AnnotationManager* annoM, QWidget* parent = nullptr);
     TaskMode getTaskMode() const {return taskMode;} //结尾加上 const 表示常成员函数，这种函数只能读取成员变量的值，而不能修改成员变量的值
     CanvasMode getCanvasMode() const {return canvasMode;}
     DrawMode getDrawMode() const {return drawMode;}
@@ -41,8 +41,8 @@ protected:
     CanvasMode canvasMode; //画布模式
     DrawMode drawMode; //画笔模式
 
-    const LabelManager* labelM;
-    const AnnotationManager* annoM;
+    LabelManager* labelM;
+    AnnotationManager* annoM;
 
     int lastPenWidth; //最后画笔大小
     int curPenWidth; //当前画笔大小
