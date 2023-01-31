@@ -215,6 +215,18 @@ void MainWindow::initToolBar() {
     connect(ui->img_action, &QAction::triggered, this, [=]() {selectImg();});
     connect(ui->file_action, &QAction::triggered, this, [=]() {selectDir();});
     connect(ui->save_action, &QAction::triggered, this, [=]() {saveFile();});
+    connect(ui->pre_action, &QAction::triggered, this, [=]() {
+        bool suc = fileM.pre();
+        if(!suc) return;
+        ui->filesList->setCurrentIndex(fileM.curRow);
+        on_listView_clicked(fileM.curRow);
+    });
+    connect(ui->next_action, &QAction::triggered, this, [=]() {
+        bool suc = fileM.next();
+        if(!suc) return;
+        ui->filesList->setCurrentIndex(fileM.curRow);
+        on_listView_clicked(fileM.curRow);
+    });
     connect(ui->init_action, &QAction::triggered, this, &MainWindow::adjustFitWindow);
     connect(ui->scanOut_action, &QAction::triggered, this, [=]() {curCanvas->setScale(curCanvas->getScale()*1.1);});
     connect(ui->scanIn_action, &QAction::triggered, this, [=]() {curCanvas->setScale(curCanvas->getScale()*0.9);});
@@ -251,9 +263,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 void  MainWindow::selectImg() {
+
+    fileM.model->removeRows(0, fileM.model->rowCount());
     QString filename;
-
-
     filename = QFileDialog::getOpenFileName(nullptr,
                                              tr("select img"),
                                               "",
@@ -263,16 +275,20 @@ void  MainWindow::selectImg() {
     fileM.imgName = img.split(".")[0];
     fileM.fullPath = filename.left(filename.lastIndexOf("/", -1));
 
+    loadImg(filename);
+
+}
+void MainWindow::loadImg(QString filename){
+    qDebug() << "open" << filename;
     if(!filename.isNull() && !filename.isEmpty()) {
         canvas2d->loadPixmap(filename);
-
         adjustFitWindow();
         clearImg();
         loadJson();
     }
-
 }
 void MainWindow::clearImg() {
+     if(ui->annoList->count() < 0) return;
      ui->annoList->clear();
      annoM.clearList();
 
@@ -301,17 +317,17 @@ void MainWindow::checkImg(QString filename) {
 }
 void MainWindow::on_listView_clicked(const QModelIndex &index)
 {
-    QString str(this->fullPath);
+    QString str(fileM.fullPath);
     QString filename = str + "/" + fileM.model->data(index).toString();
     fileM.imgName = fileM.model->data(index).toString().split(".")[0];
+    fileM.curRow = index;
     this->checkImg(filename);
-    qDebug()<<"当前路径：" << fileM.fullPath;
-    canvas2d->loadPixmap(filename);
-    adjustFitWindow();
-    clearImg();
+    qDebug()<<"当前路径：" <<filename;
+    loadImg(filename);
 }
 
 void  MainWindow::selectDir() {
+    qDebug() << "打开路径";
     QString filename;
     filename=QFileDialog::getExistingDirectory(nullptr, tr("select dir"));
     if(!filename.isNull() && !filename.isEmpty()) {
@@ -321,13 +337,15 @@ void  MainWindow::selectDir() {
         QStringListIterator ite(images);
         //全路径
         QFileInfo fileDir;
-        cout << filename.toStdString().data() << endl;
+
         fileM.fullPath = filename.toStdString().data();
         fileM.model = new QStringListModel(this);
 //        读取所有图片
         fileM.model->setStringList(images);
-
+        fileM.curRow = fileM.model->index(0);
         ui->filesList->setModel(fileM.model);
+        ui->filesList->setCurrentIndex(fileM.curRow);
+        on_listView_clicked(fileM.curRow);
         connect(ui->filesList,&QListView::clicked,
                   this,&MainWindow::on_listView_clicked);
     }

@@ -20,11 +20,14 @@ public:
     QString fullPath; //当前选择的路径
     QString imgName; // 当前文件名字
     QStringListModel *model;
+    QModelIndex curRow;
     QString fileList; //所有文件的列表
     void saveJson(QJsonObject json);
     bool checkSaveState();
     QJsonObject loadJson();
     void allClear();
+    bool pre();
+    bool next();
 };
 
 #endif // FILEMANAGER_H

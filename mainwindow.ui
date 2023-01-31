@@ -97,9 +97,6 @@
    <addaction name="img_action"/>
    <addaction name="file_action"/>
    <addaction name="save_action"/>
-   <addaction name="saveAs_action"/>
-   <addaction name="unDo_action"/>
-   <addaction name="reDo_action"/>
    <addaction name="pre_action"/>
    <addaction name="next_action"/>
    <addaction name="scanOut_action"/>
@@ -326,42 +323,6 @@
    </property>
    <property name="toolTip">
     <string>保存</string>
-   </property>
-  </action>
-  <action name="saveAs_action">
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/save-as.png</normaloff>:/icons/save-as.png</iconset>
-   </property>
-   <property name="text">
-    <string>另存为</string>
-   </property>
-   <property name="toolTip">
-    <string>另存为</string>
-   </property>
-  </action>
-  <action name="unDo_action">
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/undo.png</normaloff>:/icons/undo.png</iconset>
-   </property>
-   <property name="text">
-    <string>撤销</string>
-   </property>
-   <property name="toolTip">
-    <string>撤销</string>
-   </property>
-  </action>
-  <action name="reDo_action">
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/redo.png</normaloff>:/icons/redo.png</iconset>
-   </property>
-   <property name="text">
-    <string>下一步</string>
-   </property>
-   <property name="toolTip">
-    <string>下一步</string>
    </property>
   </action>
   <action name="pre_action">

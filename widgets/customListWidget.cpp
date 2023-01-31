@@ -80,3 +80,4 @@ void CustomListWidget:: mousePressEvent(QMouseEvent *event) {
 void CustomListWidget::update(QList<AnnoItemPtr> list) {
 
 }
+

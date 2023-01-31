@@ -81,6 +81,7 @@ public:
    void clearImg();
    void saveFile();
    void loadJson();
+   void loadImg(QString filename);
 protected:
 //   bool eventFilter(QObject *watched, QEvent *event);
 //   void mousePressEvent(QMouseEvent *event);

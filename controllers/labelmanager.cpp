@@ -65,8 +65,7 @@ bool LabelManager::fixColor(QString name, QColor color)
 
 void LabelManager::changeActiveItem(QListWidgetItem *current, QListWidgetItem *)
 {
-
-
+    if(labels.isEmpty()) return;
     curLabel = &labels.find(current->text()).value();
     qDebug() << "curIdx" << curLabel->label;
 }
@@ -92,6 +91,8 @@ QJsonArray LabelManager::saveLabel()
     return arr;
 }
 void LabelManager::allClear() {
+    if(labels.isEmpty()) return;
+    curLabel = nullptr;
     labels.clear();
     emit allCleared();
 }
@@ -103,7 +104,6 @@ void LabelManager::loadJson(QJsonArray arr) {
             LabelProperty item;
             item.loadFromJsonObject(value.toObject());
             labels.insert(item.label, item);
-
 
             emit labelAdded(item);
         }

@@ -1,6 +1,7 @@
 #include <QListWidget>
 #include <QString>
 #include <QColor>
+#include <QStringListModel>
 #include "util.h"
 #include "labelmanager.h"
 #include "controllers/annotationmanager.h"
@@ -12,6 +13,7 @@ public:
     void addCustomItemUncheckable(QString label, QColor color);
     void removeCustomItemByIdx(int idx);
     void update(QList<AnnoItemPtr> list);
+
 public slots:
     void addCustomItem(LabelProperty label);
     bool changeItemColor(QString name, QColor color);

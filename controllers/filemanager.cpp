@@ -39,7 +39,7 @@ bool FileManager:: checkSaveState() {
 QJsonObject FileManager:: loadJson() {
     QFile file(fullPath + "/" + imgName + ".json");
     if(file.exists()) {
-        qDebug() << "json 存在";
+
 
         file.open(QIODevice::ReadOnly | QIODevice::Text);
         QString val = file.readAll();
@@ -55,4 +55,20 @@ QJsonObject FileManager:: loadJson() {
 }
 void FileManager::allClear() {
     fileList.clear();
+}
+bool FileManager::pre() {
+    if(curRow.row() <= 0) {
+        QMessageBox::warning(nullptr, "Not more file", "没有上一张了");
+        return false;
+    }
+    curRow = model->index(curRow.row() -1);
+    return true;
+}
+bool FileManager:: next() {
+    if(curRow.row() >= model->rowCount() -1) {
+       QMessageBox::warning(nullptr, "Not more file", "没有下一张了");
+       return false;
+    }
+    curRow = model->index(curRow.row() +1);
+    return true;
 }
