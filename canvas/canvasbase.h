@@ -34,6 +34,7 @@ public:
     virtual QSize sizeUnscaled() const = 0;
     // 返回一个字符串描述当前的模式信息（包括task，mode，drawMode），可用于状态栏等
     virtual QString modeString() const;
+
 protected:
 
     qreal scale; //当前的缩放比例

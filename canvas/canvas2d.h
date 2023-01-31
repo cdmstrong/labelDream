@@ -23,6 +23,7 @@ public:
     // 判断像素坐标pos是否超出pixmap的范围
     bool outOfPixmap(QPoint pos);
     void addAnno(QList<QPoint> points);
+    void drawRectAnnotation(QPainter &p, QRect &rect, QColor brushColor, qreal brushAlpah, QColor penColor, qreal penAlpah, Qt::PenStyle bs = Qt::SolidLine);
 protected:
     void paintEvent(QPaintEvent* e) override;
     void mouseMoveEvent(QMouseEvent* e) override;
@@ -33,7 +34,7 @@ private:
     QPoint mousePos;    // 当前鼠标的像素坐标
 
     QList<QPoint> curPoints; //当前绘制的图形
-
+    CanvasMode mode = DRAW; //模式
 
 signals:
     void mouseMove(QPoint pos);

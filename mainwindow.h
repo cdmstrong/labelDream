@@ -57,6 +57,7 @@ public:
    void selectDir();
    QStringListModel *model;
    QString fullPath; //全路径
+   QString imgName; //图片名字
    void upPaint();
    void bindEvent();
    QString randomColor();
@@ -72,6 +73,14 @@ public:
 
 
    void taskModeChanged(int idx);
+   void canvasUpdate();
+   void _setupAnnoManager();
+   void provideAnnoContextMenu(const QPoint &pos);
+   void annoRemove(int idx);
+   void changeLabelName(QString name, QString reName);
+   void clearImg();
+   void saveFile();
+   void loadJson();
 protected:
 //   bool eventFilter(QObject *watched, QEvent *event);
 //   void mousePressEvent(QMouseEvent *event);
@@ -94,7 +103,8 @@ private:
 
     CanvasBase *curCanvas;
     Canvas2d *canvas2d;
-
+signals:
+    void clearLabel();
 private slots:
     void addAnno();
     void addLabel();

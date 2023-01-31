@@ -1,6 +1,7 @@
 #ifndef ANNOTATIONBASE_H
 #define ANNOTATIONBASE_H
 #include <QString>
+#include <QJsonObject>
 class AnnoItemBase {
 public:
     AnnoItemBase();
@@ -8,6 +9,8 @@ public:
     QString label;
     //坐标信息
     QString id;
+    virtual QJsonObject toJsonObject() const;
+    virtual void loadFromJson(const QJsonObject &json);
 protected:
 
 };

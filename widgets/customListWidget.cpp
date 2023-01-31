@@ -1,5 +1,6 @@
 #include "customListWidget.h"
 #include <QDebug>
+#include <annotations/rectannoitem.h>
 void CustomListWidget::addCustomItem(LabelProperty label) {
     QListWidgetItem * item1 = new QListWidgetItem(ColorUtils::colorIcon(label.color), label.label);
     item1->setFlags(item1->flags() | Qt::ItemIsUserCheckable);
@@ -8,6 +9,12 @@ void CustomListWidget::addCustomItem(LabelProperty label) {
 
 //    this->setContextMenuPolicy(Qt::CustomContextMenu);
     //    connect(ui->labelsList, &QListWidget::customContextMenuRequested, this, &MainWindow::popMenu);
+}
+
+void CustomListWidget::addCustomItemUncheckable(QString label, QColor color)
+{
+    QListWidgetItem *item = new QListWidgetItem(ColorUtils::colorIcon(color), label);
+    this->addItem(item);
 }
 
 bool CustomListWidget::changeItemColor(QString name, QColor color)
@@ -22,7 +29,7 @@ bool CustomListWidget::changeItemName(QString name, QString reName)
 {
     QListWidgetItem* item = _findItemByName(name);
     if(!item) return false;
-    qDebug() << "开始设置名字" << reName;
+
     item->setText(reName);
     return true;
 }
@@ -33,6 +40,16 @@ bool CustomListWidget::changeCheckState(QString name, Qt::CheckState check)
     if(!item) return false;
     item->setCheckState(check);
     return true;
+
+}
+
+void CustomListWidget::changeAnnoName(QList<AnnoItemPtr> list)
+{
+
+    for(int i = 0; i< count(); i++) {
+        auto item = Rectannoitem::cast_rectPtr(list.at(i));
+        this->item(i)->setText(item.get()->toStr());
+    }
 
 }
 CustomListWidget::CustomListWidget(QWidget *parent):QListWidget(parent){
@@ -47,3 +64,19 @@ QListWidgetItem* CustomListWidget::_findItemByName(QString labelName) {
     return nullptr;
 }
 
+void CustomListWidget:: removeCustomItemByIdx(int idx) {
+    delete this->takeItem(idx);
+    clearSelection();
+}
+void CustomListWidget:: mousePressEvent(QMouseEvent *event) {
+    QModelIndex item = indexAt(event->pos());
+    if(!item.isValid()) {
+        clearSelection();
+    } else {
+        QListWidget::mousePressEvent(event);
+    }
+}
+//刷新界面
+void CustomListWidget::update(QList<AnnoItemPtr> list) {
+
+}

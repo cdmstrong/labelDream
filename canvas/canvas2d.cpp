@@ -23,40 +23,72 @@ void Canvas2d::paintEvent(QPaintEvent* event)
         return ;
     }
     QPainter p(this);
-
+    QPen pen(Qt::white);
     p.scale(scale, scale);
-    p.setPen(QPen(Qt::white));
+    p.setPen(pen);
     p.translate(offsetToCenter());
     p.drawPixmap(0, 0, pixmap);
 
     //绘制标签
 
 
-
-
-
-
     //
 //    qDebug() << "paintEvent" << curPoints.length();
-    if(curPoints.length() >0) {
-        p.drawRect(QRect(curPoints[0], curPoints[1]).normalized());
-    }
-    QBrush brush(Qt::SolidPattern);
+    if(mode == DRAW) {
+        if(curPoints.length() == 2) {
+            p.drawRect(QRect(curPoints[0], curPoints[1]).normalized());
+        }
+        QBrush brush(Qt::SolidPattern);
 
-    QList<AnnoItemPtr> list = annoM->getList();
-    for(int i = 0;i <list.length(); i++) {
-        auto ptr = Rectannoitem::cast_rectPtr(list[i]);
-        QColor color = labelM->getLabel(ptr.get()->label)->color;
-        brush.setColor(color);
+        QList<AnnoItemPtr> list = annoM->getList();
+        for(int i = 0;i <list.length(); i++) {
 
-        p.setBrush(brush);
-        p.drawRect(QRect(ptr.get()->points[0], ptr.get()->points[1]).normalized());
+            auto ptr = Rectannoitem::cast_rectPtr(list[i]);
+
+            QColor color = labelM->getLabel(ptr.get()->label)->color;
+
+            brush.setColor(color);
+
+            p.setBrush(brush);
+            QRect rect(ptr.get()->points[0], ptr.get()->points[1]);
+            drawRectAnnotation(p, rect, brush.color(), 0.6, pen.color(), 1);
+//            p.drawRect();
+            QFont font("Helvetica"); font.setFamily("Times"); font.setPixelSize(LABEL_PIXEL_SIZE);
+            p.setFont(font);
+            p.drawText(QPoint(ptr.get()->points[0].x() -20, ptr.get()->points[0].y()-20), ptr.get()->label);
+        }
+    } else if(mode == SELECT) {
+        QBrush brush(Qt::SolidPattern);
+        //把所有的框亮度调低
+        QList<AnnoItemPtr> list = annoM->getList();
+        for(int i = 0; i < list.length(); i ++) {
+            if(i == annoM->getSelectId()) continue;
+            auto ptr = Rectannoitem::cast_rectPtr(list[i]);
+
+            QColor color = labelM->getLabel(ptr.get()->label).value().color;
+
+            QRect rect(ptr.get()->points[0], ptr.get()->points[1]);
+            drawRectAnnotation(p, rect, color, 0.3, pen.color(), 0.3);
+        }
+        auto selectItem = Rectannoitem::cast_rectPtr(annoM->getItem(annoM->getSelectId()));
+        //绘制选中框
+
+        drawRectAnnotation(p, selectItem.get()->rect, labelM->getLabel(selectItem.get()->label)->color, 1, pen.color(), 1, Qt::DashLine);
         QFont font("Helvetica"); font.setFamily("Times"); font.setPixelSize(LABEL_PIXEL_SIZE);
         p.setFont(font);
-        p.drawText(QPoint(ptr.get()->points[0].x() -20, ptr.get()->points[0].y()-20), ptr.get()->label);
+        p.drawText(QPoint(selectItem.get()->points[0].x() -20, selectItem.get()->points[0].y()-20), selectItem.get()->label);
     }
 
 
+}
+void Canvas2d::drawRectAnnotation(QPainter &p, QRect &rect, QColor brushColor, qreal brushAlpah, QColor penColor, qreal penAlpah, Qt::PenStyle bs) {
+
+    p.save();
+
+    brushColor.setAlphaF(brushAlpah); QBrush brush(brushColor); p.setBrush(brush);
+    penColor.setAlphaF(penAlpah); QPen pen(penColor);  pen.setStyle(bs); p.setPen(pen);
+    p.drawRect(rect);
+    p.restore();
 }
 QPoint Canvas2d::offsetToCenter()
 {
@@ -96,6 +128,7 @@ void Canvas2d::mouseMoveEvent(QMouseEvent* event)
 void Canvas2d::mousePressEvent(QMouseEvent* e)
 {
     qDebug() << "mousePressEvent";
+
     QPoint mousePos = boundedPixelPos(e->pos());
 
     qDebug() << taskMode << e->button();
@@ -114,21 +147,25 @@ void Canvas2d::mousePressEvent(QMouseEvent* e)
                 curPoints.clear();
             }
 
-            update();
 
+
+        } else if(e->button() == Qt::RightButton) {
+            curPoints.clear();
         }
     }
+     update();
 
 }
 void Canvas2d::addAnno(QList<QPoint> points) {
     //如果当前有选择的标签
     LabelProperty* text = labelM->getCurLabel();
-    qDebug() << "cur" << text;
+
     if(!text) {
         QMessageBox::information(this, "error", "请选择您要标注的标签");
         return;
     }
-    AnnoItemBase* anno = new Rectannoitem(text->id, text->label, points);
+    QRect rect(curPoints[0], curPoints[1]);
+    AnnoItemBase* anno = new Rectannoitem(rect, text->id, text->label, points);
 
     annoM->addAnno(std::shared_ptr<AnnoItemBase>(anno));
 }
@@ -146,9 +183,10 @@ void Canvas2d::loadPixmap(QPixmap img)
     update();
 }
 
-void Canvas2d::setCanvasMode(CanvasMode)
+void Canvas2d::setCanvasMode(CanvasMode newMode)
 {
-
+    mode = newMode;
+    update();
 }
 
 void Canvas2d::setTaskMode(TaskMode mode)

@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 
 #include <QAction>
+#include <QJsonArray>
+#include <QJsonDocument>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     labelM(this),
@@ -9,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     annoM(this),
     ui(new Ui::MainWindow)
 {
+//    setWindowFlags(Qt::WindowCloseButtonHint | Qt::MSWindowsFixedSizeDialogHint);
 
     ui->setupUi(this);
 
@@ -16,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //    ui->img->installEventFilter(this);
     //标签相关
     _setupLabelManager();
+    _setupAnnoManager();
     //初始化画布 2d
     canvas2d = new Canvas2d(&labelM, &annoM, ui->scrollArea);
 
@@ -39,6 +43,12 @@ void MainWindow::_setupLabelManager() {
     connect(ui->labelsList, &QListWidget::customContextMenuRequested, this, &MainWindow::popLabelMenu);
     connect(&labelM, &LabelManager::labelAdded, ui->labelsList, &CustomListWidget::addCustomItem);
     connect(ui->labelsList, &QListWidget::currentItemChanged, &labelM, &LabelManager::changeActiveItem);
+    connect(this, &MainWindow::clearLabel, this, [=](){
+        labelM.clearCurLabel();
+    });
+    connect(&labelM, &LabelManager::allCleared, this, [=](){
+        this->ui->labelsList->clear();
+    });
 }
 void MainWindow:: bindEvent() {
     connect(ui->btnAdd, &QPushButton::clicked,this, &MainWindow::addLabel);
@@ -48,13 +58,74 @@ void MainWindow:: bindEvent() {
 }
 //添加标签
 void MainWindow::addAnno() {
+
     if(labelM.getCurLabel() == nullptr) {
         QMessageBox::information(this, "error", "请选择您要标注的标签");
         return;
     }
 
 }
+//标签管理类
+void MainWindow:: _setupAnnoManager() {
+    connect(&annoM, &AnnotationManager::AnnotationAdded, this, [this](const AnnoItemPtr &item) {
+       this->ui->annoList->addCustomItemUncheckable(Rectannoitem::cast_rectPtr(item).get()->toStr(), labelM.getCurLabel()->color);
+    });
+    connect(&annoM, &AnnotationManager::AnnotationLoadAdded, this, [this](const AnnoItemPtr &item) {
+       this->ui->annoList->addCustomItemUncheckable(Rectannoitem::cast_rectPtr(item).get()->toStr(), labelM.getLabel(item->label)->color);
+    });
 
+    //点击标签进入编辑模式
+    connect(ui->annoList, &QListWidget::itemSelectionChanged, this, [this]() {
+       auto items = ui->annoList->selectedItems();
+
+       if(items.length() == 0) {
+           curCanvas->setCanvasMode(DRAW);
+           annoM.setSelectId(-1);
+           qDebug() << "选中的个数" << -1;
+       } else {
+           curCanvas -> setCanvasMode(SELECT);
+           annoM.setSelectId(ui->annoList->row(items[0]));
+           qDebug() << "选中的个数" << ui->annoList->row(items[0]);
+       }
+    });
+    //点击删除菜单
+    ui->annoList->setProperty("contextMenuPolicy", Qt:: CustomContextMenu);
+    connect(ui->annoList, &QListWidget::customContextMenuRequested,
+            this, &MainWindow::provideAnnoContextMenu);
+
+    connect(&annoM, &AnnotationManager::AnnotationRemoved, this, &MainWindow::annoRemove);
+
+    connect(&annoM, &AnnotationManager::annoChanged, this, &MainWindow::canvasUpdate);
+    connect(&annoM, &AnnotationManager::selectedChanged, this, &MainWindow::canvasUpdate);
+    connect(&annoM, &AnnotationManager::cleared, this, [=](){
+        this->ui->annoList->clear();
+    });
+}
+//右键弹出菜单
+void MainWindow:: provideAnnoContextMenu(const QPoint& pos) {
+    QModelIndex index = ui->annoList->indexAt(pos);
+
+    if(!index.isValid()) return ;
+    int row = index.row();
+
+    QMenu menu;
+    menu.addAction(tr("delete"));
+    QAction* select = menu.exec(QCursor::pos());
+    if(select) {
+        if(select->text().contains("delete")) {
+            annoM.delAnno(row);
+            curCanvas->setCanvasMode(DRAW);
+        }
+    }
+}
+void MainWindow:: annoRemove(int idx) {
+    ui->annoList->removeCustomItemByIdx(idx);
+    if(annoM.getSelectId() == idx) {
+        annoM.setSelectId(-1);
+        curCanvas->setCanvasMode(DRAW);
+    }
+    canvasUpdate();
+}
 void MainWindow::popLabelMenu(const QPoint& pos)
 {
 
@@ -76,11 +147,12 @@ void MainWindow::popLabelMenu(const QPoint& pos)
             bool ok;
             QString str = QInputDialog::getText(this, "修改标签", "修改的名称", QLineEdit::Normal, wellName, &ok);
             if(!ok || str.isEmpty()) return false;
-            connect(&labelM, &LabelManager::changeItemName, ui->labelsList, &CustomListWidget::changeItemName);
             bool suc = labelM.fixLabel(wellName, str);
             if(!suc) QMessageBox::information(this, "warnnig", "标签已存在");
-        });
 
+
+        });
+        connect(&labelM, &LabelManager::changeItemName, this, &MainWindow:: changeLabelName);
         connect(&changeColor, &QAction::triggered, this, [=]() {
             // rename
             bool ok;
@@ -98,6 +170,16 @@ void MainWindow::popLabelMenu(const QPoint& pos)
         menu.exec(QCursor::pos());  //在当前鼠标位置显示
 
     }
+}
+//修改标签名字事件
+void MainWindow:: changeLabelName(QString name, QString reName) {
+    qDebug() << "修改名字";
+    ui->labelsList->changeItemName(name, reName);
+
+    annoM.reNameLabel(name, reName);
+    //修改所有的标签名字
+    ui->annoList->changeAnnoName(annoM.getList());
+
 }
 void MainWindow::addLabel() {
     cout << "addLabel" << endl;
@@ -132,7 +214,7 @@ void MainWindow::initToolBar() {
 
     connect(ui->img_action, &QAction::triggered, this, [=]() {selectImg();});
     connect(ui->file_action, &QAction::triggered, this, [=]() {selectDir();});
-
+    connect(ui->save_action, &QAction::triggered, this, [=]() {saveFile();});
     connect(ui->init_action, &QAction::triggered, this, &MainWindow::adjustFitWindow);
     connect(ui->scanOut_action, &QAction::triggered, this, [=]() {curCanvas->setScale(curCanvas->getScale()*1.1);});
     connect(ui->scanIn_action, &QAction::triggered, this, [=]() {curCanvas->setScale(curCanvas->getScale()*0.9);});
@@ -147,69 +229,23 @@ void MainWindow::setMousePos(QPoint pos) {
 
     mousePosLabel->setText("(" + QString::number(pos.x()) + "," + QString::number(pos.y()) + ")" );
 }
+void MainWindow::saveFile() {
+    //保存所有label and anno
+    QJsonObject json;
+    json.insert("annotations", annoM.saveAnno());
+    json.insert("labels", labelM.saveLabel());
+
+    fileM.saveJson(json);
+
+
+}
 QAction* MainWindow::addBar(string icon, string barName) {
 
     QIcon *file = new QIcon(icon.c_str());
     QAction *action = toolBar->addAction(*file, barName.c_str());
     return action;
 }
-//https://blog.csdn.net/XCJandLL/article/details/127458147
-//bool MainWindow:: eventFilter(QObject *watched, QEvent *event) {
-//    qDebug() << event->type() << endl;
-//    if(watched ==ui->img  && event->type() == QEvent::Paint) {
 
-//        upPaint();
-
-//    }
-//    return QWidget::eventFilter(watched, event);
-//}
-void MainWindow:: upPaint() {
-    QPainter painter(ui->img);
-
-    QString imagePath = "F:/python/yolov5/carData/images/01-90_265-231&522_405&574-405&571_235&574_231&523_403&522-0_0_3_1_28_29_30_30-134-56.jpg";
-    QPixmap pix(imagePath);
-    painter.drawPixmap((ui->img->width() - pix.width())/2, (ui->img->height() - pix.height())/2, pix.width(), pix.height(), QPixmap(imagePath));
-//    ui->scrollArea->set
-    QPen pen;
-    pen.setColor(Qt::red);
-    painter.setPen(pen);
-//    painter.drawRect(1, 1, 100, 500);
-//    painter.drawText(10,30,"测试文字");
-    QBrush brush;
-    brush.setStyle(Qt::SolidPattern);
-    brush.setColor(QColor::fromRgba64(171, 165, 141, 150));
-
-    painter.setBrush(brush);
-    painter.drawRect(rect[0],rect[1],rect[2],rect[3]);
-}
-
-//void MainWindow::mousePressEvent(QMouseEvent *event) {
-//    if(event->button() == Qt::LeftButton) {
-//        this->isPressed = true;
-//        rect[0] = event->pos().x() - this->OFFSETX;
-//        rect[1] = event->pos().y() - this->OFFSETY;
-//        cout << rect[0] << "," << rect[1] << endl;
-//    }
-//}
-////鼠标移动
-//void MainWindow::mouseMoveEvent(QMouseEvent *event){
-//    if(this->isPressed) {
-//        rect[2] = event->pos().x()-this->OFFSETX - rect[0];
-//        rect[3] = event->pos().y()-this->OFFSETY - rect[1];
-//        qDebug() << "重绘" << endl;
-//        this->update();
-
-//    }
-//}
-//void MainWindow::mouseReleaseEvent(QMouseEvent *event){
-//    if(event->button() == Qt:: LeftButton) {
-//        isPressed=false;
-//        rect[2] = event->pos().x()-this->OFFSETX - rect[0];
-//        rect[3] = event->pos().y()-this->OFFSETY- rect[1];
-//        this->update();
-//        cout <<"release" << endl;
-//    }
-//}
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -218,20 +254,27 @@ void  MainWindow::selectImg() {
     QString filename;
 
 
-    filename=QFileDialog::getOpenFileName(nullptr,
+    filename = QFileDialog::getOpenFileName(nullptr,
                                              tr("select img"),
                                               "",
                                               tr("Images (*.png *.bmp *.jpg *.tif *.GIF )"));
+
+    QString img = filename.right(filename.length() - filename.lastIndexOf("/") - 1);
+    fileM.imgName = img.split(".")[0];
+    fileM.fullPath = filename.left(filename.lastIndexOf("/", -1));
 
     if(!filename.isNull() && !filename.isEmpty()) {
         canvas2d->loadPixmap(filename);
 
         adjustFitWindow();
-
-
+        clearImg();
+        loadJson();
     }
 
-
+}
+void MainWindow::clearImg() {
+     ui->annoList->clear();
+     annoM.clearList();
 
 }
 qreal MainWindow::scaleFitWindow() const
@@ -259,9 +302,13 @@ void MainWindow::checkImg(QString filename) {
 void MainWindow::on_listView_clicked(const QModelIndex &index)
 {
     QString str(this->fullPath);
-    this->checkImg(str + "/" + this->model->data(index).toString());
-    qDebug()<<this->model->data(index).toString();
-    qDebug()<<"当前路径：" << this->fullPath;
+    QString filename = str + "/" + fileM.model->data(index).toString();
+    fileM.imgName = fileM.model->data(index).toString().split(".")[0];
+    this->checkImg(filename);
+    qDebug()<<"当前路径：" << fileM.fullPath;
+    canvas2d->loadPixmap(filename);
+    adjustFitWindow();
+    clearImg();
 }
 
 void  MainWindow::selectDir() {
@@ -275,19 +322,37 @@ void  MainWindow::selectDir() {
         //全路径
         QFileInfo fileDir;
         cout << filename.toStdString().data() << endl;
-        this->fullPath = filename.toStdString().data();
-        this->model = new QStringListModel(this);
+        fileM.fullPath = filename.toStdString().data();
+        fileM.model = new QStringListModel(this);
 //        读取所有图片
-        this->model->setStringList(images);
+        fileM.model->setStringList(images);
 
-        ui->filesList->setModel(this->model);
+        ui->filesList->setModel(fileM.model);
         connect(ui->filesList,&QListView::clicked,
                   this,&MainWindow::on_listView_clicked);
     }
 
 }
 
+void MainWindow::loadJson() {
+    annoM.clearList();
+    labelM.allClear();
+    QJsonObject json = fileM.loadJson();
+    if(!json.empty()) {
+        qDebug() << "arr" << json.value("annotations").toArray();
 
+        labelM.loadJson(json.value("labels").toArray());
+        annoM.loadJson(json.value("annotations").toArray());
+    }
+//
+
+ }
+void MainWindow::canvasUpdate()
+{
+
+   canvas2d->update();
+
+}
 
 void MainWindow::on_labeltips_clicked() {
 
